@@ -27,7 +27,31 @@ struct PairMap {
 
     using Task1 = function<void(const UnItr1 &v1)>;
     using Task2 = function<void(const UnItr2 &v2)>;
-    using TaskPair = function<void(const UnItr1 *v1, const UnItr2 *v2)>;
+    using TaskPair = function<void(const UnItr1 &v1, const UnItr2 &v2)>;
+    using TaskPairPtr = function<void(const UnItr1 *v1, const UnItr2 *v2)>;
+
+    static void run_intersection(Cont1 &c1, Cont2 &c2, const TaskPair &task) {
+
+        Itr1 be1 = c1.begin();
+        Itr1 en1 = c1.end();
+        Itr2 be2 = c2.begin();
+        Itr2 en2 = c2.end();
+
+        while (be1 != en1 && be2 != en2) {
+
+            if (get_key(*be1) < get_key(*be2))
+                ++be1;
+
+            else if (get_key(*be2) < get_key(*be1))
+                ++be2;
+
+            else {
+                task(*be1, *be2);
+                ++be1;
+                ++be2;
+            }
+        }
+    }
 
     static void run_diference_2(Cont1 &c1, Cont2 &c2, const Task2 &task) {
         PairMap<Cont2,Cont1>::run_diference(c2, c1, task); }
@@ -53,7 +77,7 @@ struct PairMap {
         std::for_each(be1, en1, task);
     }
 
-    static void run_union(Cont1 &c1, Cont2 &c2, const TaskPair &task) {
+    static void run_union(Cont1 &c1, Cont2 &c2, const TaskPairPtr &task) {
 
         Itr1 be1 = c1.begin();
         Itr1 en1 = c1.end();
